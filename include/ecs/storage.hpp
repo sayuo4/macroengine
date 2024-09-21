@@ -67,7 +67,7 @@ namespace macroengine {
 			return *data[entity];
 		}
 
-		std::optional<std::reference_wrapper<T>> tryGet(const Entity& entity) const {
+		auto tryGet(const Entity& entity) const -> std::optional<std::reference_wrapper<T>> {
 			if (!has(entity)) {
 				return std::nullopt;
 			}
