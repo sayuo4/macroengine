@@ -1,13 +1,13 @@
 #ifndef MACROENGINE_I_STORAGE
 #define MACROENGINE_I_STORAGE
 
-#include "ecs/types/entity.hpp"
+#include "ecs/entity.hpp"
 
 namespace macroengine {
 	class IStorage {
 	protected:
 		virtual ~IStorage() = default;
-		virtual void destroy(const Entity& entity) = 0;
+		virtual void destroy(const Entity &entity) = 0;
 
 		friend class World;
 	};

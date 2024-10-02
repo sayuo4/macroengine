@@ -1,9 +1,10 @@
 #ifndef MACROENGINE_WORLD_HPP
 #define MACROENGINE_WORLD_HPP
 
-#include "ecs/types/entity.hpp"
+#include "ecs/entity.hpp"
 #include "ecs/i_storage.hpp"
 #include "ecs/storage.hpp"
+#include "ecs/basic_exclude.hpp"
 
 #include <vector>
 #include <typeindex>
@@ -25,11 +26,11 @@ namespace macroengine {
 		std::vector<Entity> aliveEntities;
 		std::vector<Entity> activeEntities;
 
-		void validateEntity(const Entity& entity, std::string error) const;
-		void validateEntityAliveState(const Entity& entity, std::string error) const;
+		void validateEntity(const Entity &entity, std::string error) const;
+		void validateEntityAliveState(const Entity &entity, std::string error) const;
 
 		template <typename T>
-		Storage<T>& getStorage() {
+		Storage<T> &getStorage() {
 			static Storage<T> storage;
 			static bool isRegistered = false;
 
@@ -41,13 +42,13 @@ namespace macroengine {
 			return storage;
 		}
 
-		template <typename... T>
-		auto getFromVec(std::vector<Entity>& vec) -> std::vector<std::tuple<T&...>> {
+		template <typename... T, typename... U>
+		auto getFromVec(std::vector<Entity> &vec, BasicExclude<U...>) -> std::vector<std::tuple<T&...>> {
 			std::vector<std::tuple<T&...>> result;
 			result.reserve(vec.size());
 
-			for (const auto& entity : vec) {
-				if ((getStorage<T>().has(entity) && ...)) {
+			for (const auto &entity : vec) {
+				if ((getStorage<T>().has(entity) && ...) && (!(getStorage<U>().has(entity) && ...) || sizeof...(U) == 0)) {
 					result.emplace_back(*getStorage<T>().data[entity]...);
 				}
 			}
@@ -60,22 +61,22 @@ namespace macroengine {
 
 		Entity create();
 
-		World& destroy(const Entity& entity);
-		World& destroyAll();
+		World &destroy(const Entity &entity);
+		World &destroyAll();
 
-		bool tryDestroy(const Entity& entity);
+		bool tryDestroy(const Entity &entity);
 		
-		World& activate(const Entity& entity);
-		World& activateAll();
+		World &activate(const Entity &entity);
+		World &activateAll();
 
-		World& disable(const Entity& entity);
-		World& disableAll();
+		World &disable(const Entity &entity);
+		World &disableAll();
 
-		bool tryActivate(const Entity& entity);
-		bool tryDisable(const Entity& entity);
+		bool tryActivate(const Entity &entity);
+		bool tryDisable(const Entity &entity);
 
-		bool isAlive(const Entity& entity);
-		bool isActive(const Entity& entity);
+		bool isAlive(const Entity &entity);
+		bool isActive(const Entity &entity);
 
 		std::vector<Entity> getAllEntities();
 		std::vector<Entity> getAliveEntities();
@@ -86,7 +87,7 @@ namespace macroengine {
 		std::size_t getActiveEntitiesCount();
 
 		template <typename T>
-		World& insert(const Entity& entity, T&& component) {
+		World &insert(const Entity &entity, T &&component = T{}) {
 			validateEntity(entity, "Trying to insert a component to an invalid entity.");
 			validateEntityAliveState(entity, "Trying to insert a component to a destroyed entity.");
 
@@ -96,7 +97,7 @@ namespace macroengine {
 		}
 
 		template <typename T>
-		World& replace(const Entity& entity, T&& component) {
+		World &replace(const Entity &entity, T &&component) {
 			validateEntity(entity, "Trying to replace a component in an invalid entity.");
 			validateEntityAliveState(entity, "Trying to replace a component in a destroyed entity.");
 
@@ -106,7 +107,7 @@ namespace macroengine {
 		}
 
 		template <typename T>
-		World& insertOrReplace(const Entity& entity, T&& component) {
+		World &insertOrReplace(const Entity &entity, T &&component) {
 			validateEntity(entity, "Trying to insert/replace a component in an invalid entity.");
 			validateEntityAliveState(entity, "Trying to insert/replace a component in a destroyed entity.");			
 			
@@ -116,7 +117,7 @@ namespace macroengine {
 		}
 
 		template <typename T>
-		World& remove(const Entity& entity) {
+		World &remove(const Entity &entity) {
 			validateEntity(entity, "Trying to remove a component from an invalid entity.");
 			validateEntityAliveState(entity, "Trying to remove a component from a destroyed entity.");
 
@@ -126,7 +127,7 @@ namespace macroengine {
 		}
 
 		template <typename T>
-		bool tryRemove(const Entity& entity) {
+		bool tryRemove(const Entity &entity) {
 			validateEntity(entity, "Trying to remove a component from an invalid entity.");
 			validateEntityAliveState(entity, "Trying to remove a component from a destroyed entity.");
 
@@ -134,7 +135,7 @@ namespace macroengine {
 		}
 
 		template <typename T>
-		T& get(const Entity& entity) {
+		T &get(const Entity &entity) {
 			validateEntity(entity, "Trying to get a component from an invalid entity.");
 			validateEntityAliveState(entity, "Trying to get a component from a destroyed entity.");
 
@@ -142,7 +143,7 @@ namespace macroengine {
 		}
 
 		template <typename... T>
-		std::tuple<T&...> get(const Entity& entity) {
+		std::tuple<T&...> get(const Entity &entity) {
 			validateEntity(entity, "Trying to get a components from an invalid entity.");
 			validateEntityAliveState(entity, "Trying to get a components from a destroyed entity.");
 
@@ -153,18 +154,8 @@ namespace macroengine {
 			return std::make_tuple(std::ref(*getStorage<T>().data[entity])...);
 		}
 
-		template <typename... T>
-		auto get() -> std::vector<std::tuple<T&...>> {
-			return getFromVec<T...>(activeEntities);
-		}
-
-		template <typename... T>
-		auto getAll() -> std::vector<std::tuple<T&...>> {
-			return getFromVec<T...>(aliveEntities);
-		}
-
 		template <typename T>
-		auto tryGet(const Entity& entity) -> std::optional<std::reference_wrapper<T>> {
+		auto tryGet(const Entity &entity) -> std::optional<std::reference_wrapper<T>> {
 			validateEntity(entity, "Trying to get a component from an invalid entity.");
 			validateEntityAliveState(entity, "Trying to get a component from a destroyed entity.");
 
@@ -172,7 +163,7 @@ namespace macroengine {
 		}
 
 		template <typename... T>
-		auto tryGet(const Entity& entity) -> std::optional<std::tuple<T&...>> {
+		auto tryGet(const Entity &entity) -> std::optional<std::tuple<T&...>> {
 			validateEntity(entity, "Trying to get a components from an invalid entity.");
 			validateEntityAliveState(entity, "Trying to get a components from a destroyed entity.");
 		
@@ -183,8 +174,18 @@ namespace macroengine {
 			return std::make_tuple(std::ref(*getStorage<T>().data[entity])...);
 		}
 
+		template <typename... T, typename... U>
+		auto get(BasicExclude<U...> exclude = BasicExclude{}) -> std::vector<std::tuple<T&...>> {
+			return getFromVec<T...>(activeEntities, exclude);
+		}
+
+		template <typename... T, typename... U>
+		auto getAll(BasicExclude<U...> exclude = BasicExclude{}) -> std::vector<std::tuple<T&...>> {
+			return getFromVec<T...>(aliveEntities, exclude);
+		}
+
 		template <typename T>
-		bool has(const Entity& entity) {
+		bool has(const Entity &entity) {
 			validateEntity(entity, "Trying to check a component from in invalid entity.");
 			validateEntityAliveState(entity, "Trying to check a component in a destroyed entity.");
 
@@ -192,12 +193,14 @@ namespace macroengine {
 		}
 
 		template <typename... T>
-		bool has(const Entity& entity) {
+		bool has(const Entity &entity) {
 			validateEntity(entity, "Trying to check a components from in invalid entity.");
 			validateEntityAliveState(entity, "Trying to check a components in a destroyed entity.");
 
 			return (getStorage<T>().has(entity) && ...);
 		}
+
+		friend class App;
 	};
 }
 

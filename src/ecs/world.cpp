@@ -19,7 +19,7 @@ namespace macroengine {
 		return entity;
 	}
 
-	World& World::destroy(const Entity& entity) {
+	World &World::destroy(const Entity &entity) {
 		validateEntity(entity, "Trying to destroy an invalid entity.");
 		validateEntityAliveState(entity, "Trying to destroy an entity that's already destroyed.");
 		
@@ -29,14 +29,14 @@ namespace macroengine {
 		aliveEntities.erase(std::remove(aliveEntities.begin(), aliveEntities.end(), entity));
 		activeEntities.erase(std::remove(activeEntities.begin(), activeEntities.end(), entity));
 
-		for (const auto& storage : storages) {
+		for (const auto &storage : storages) {
 			storage->destroy(entity);
 		}
 
 		return *this;
 	}
 
-	bool World::tryDestroy(const Entity& entity) {
+	bool World::tryDestroy(const Entity &entity) {
 		validateEntity(entity, "Trying to destroy an invalid entity.");
 		
 		if (!entityAliveStates[entity]) {
@@ -49,22 +49,22 @@ namespace macroengine {
 		aliveEntities.erase(std::remove(aliveEntities.begin(), aliveEntities.end(), entity));
 		activeEntities.erase(std::remove(activeEntities.begin(), activeEntities.end(), entity));
 
-		for (const auto& storage : storages) {
+		for (const auto &storage : storages) {
 			storage->destroy(entity);
 		}
 
 		return true;
 	}
 
-	World& World::destroyAll() {
-		for (const auto& entity : aliveEntities) {
+	World &World::destroyAll() {
+		for (const auto &entity : aliveEntities) {
 			destroy(entity);
 		}
 
 		return *this;
 	}
 
-	World& World::activate(const Entity& entity) {
+	World &World::activate(const Entity &entity) {
 		validateEntity(entity, "Trying to activate an invalid entity.");
 		validateEntityAliveState(entity, "Trying to activate a destroyed entity.");
 
@@ -78,15 +78,15 @@ namespace macroengine {
 		return *this;
 	}
 
-	World& World::activateAll() {
-		for (const auto& entity : aliveEntities) {
+	World &World::activateAll() {
+		for (const auto &entity : aliveEntities) {
 			tryActivate(entity);
 		}
 
 		return *this;
 	}
 
-	World& World::disable(const Entity& entity) {
+	World &World::disable(const Entity &entity) {
 		validateEntity(entity, "Trying to disable an invalid entity.");
 		validateEntityAliveState(entity, "Trying to disable a destroyed entity.");
 
@@ -100,15 +100,15 @@ namespace macroengine {
 		return *this;
 	}
 
-	World& World::disableAll() {
-		for (const auto& entity : activeEntities) {
+	World &World::disableAll() {
+		for (const auto &entity : activeEntities) {
 			disable(entity);
 		}
 
 		return *this;
 	}
 
-	bool World::tryActivate(const Entity& entity) {
+	bool World::tryActivate(const Entity &entity) {
 		validateEntity(entity, "Trying to activate an invalid entity.");
 		validateEntityAliveState(entity, "Trying to activate a destroyed entity.");
 
@@ -122,7 +122,7 @@ namespace macroengine {
 		return true;
 	}
 
-	bool World::tryDisable(const Entity& entity) {
+	bool World::tryDisable(const Entity &entity) {
 		validateEntity(entity, "Trying to disable an invalid entity.");
 		validateEntityAliveState(entity, "Trying to disable a destroyed entity.");
 
@@ -136,13 +136,13 @@ namespace macroengine {
 		return true;
 	}
 
-	bool World::isAlive(const Entity& entity) {
+	bool World::isAlive(const Entity &entity) {
 		validateEntity(entity, "Trying to check the alive state of an invalid entity.");
 
 		return entityAliveStates[entity];
 	}
 
-	bool World::isActive(const Entity& entity) {
+	bool World::isActive(const Entity &entity) {
 		validateEntity(entity, "Trying to check the active state of an invalid entity.");
 		validateEntityAliveState(entity, "Trying to check the active state of a destroyed entity.");
 
@@ -173,13 +173,13 @@ namespace macroengine {
 		return activeEntities.size();
 	}
 
-	void World::validateEntity(const Entity& entity, std::string error) const {
+	void World::validateEntity(const Entity &entity, std::string error) const {
 		if (entity >= nextEntity) {
 			throw std::runtime_error(error);
 		}
 	}
 
-	void World::validateEntityAliveState(const Entity& entity, std::string error) const {
+	void World::validateEntityAliveState(const Entity &entity, std::string error) const {
 		if (!entityAliveStates[entity]) {
 			throw std::runtime_error(error);
 		}

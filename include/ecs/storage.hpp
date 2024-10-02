@@ -18,7 +18,7 @@ namespace macroengine {
 
 		Storage() {}
 
-		void insert(const Entity& entity, T&& component) {
+		void insert(const Entity &entity, T &&component) {
 			if (has(entity)) {
 				throw std::runtime_error("Trying to insert the same component twice.");
 			}
@@ -28,7 +28,7 @@ namespace macroengine {
 			data[entity] = std::make_unique<T>(std::move(component));
 		}
 
-		void replace(const Entity& entity, T&& component) {
+		void replace(const Entity &entity, T &&component) {
 			if (!has(entity)) {
 				throw std::runtime_error("Trying to replace a component that hasn't been added.");
 			}
@@ -36,13 +36,13 @@ namespace macroengine {
 			data[entity] = std::make_unique<T>(std::move(component));
 		}
 
-		void insertOrReplace(const Entity& entity, T&& component) {
+		void insertOrReplace(const Entity &entity, T &&component) {
 			updateCapacity(entity);
 
 			data[entity] = std::make_unique<T>(std::move(component));		
 		}
 
-		void remove(const Entity& entity) {
+		void remove(const Entity &entity) {
 			if (!has(entity)) {
 				throw std::runtime_error("Trying to remove a component that hasn't been added.");
 			}
@@ -50,7 +50,7 @@ namespace macroengine {
 			data[entity] = nullptr;
 		}
 
-		bool tryRemove(const Entity& entity) {
+		bool tryRemove(const Entity &entity) {
 			if (!has(entity)) {
 				return false;
 			}
@@ -59,7 +59,7 @@ namespace macroengine {
 			return true;
 		}
 
-		T& get(const Entity& entity) const {
+		T &get(const Entity &entity) const {
 			if (!has(entity)) {
 				throw std::runtime_error("Entity doesn't have the requested component.");
 			}
@@ -67,7 +67,7 @@ namespace macroengine {
 			return *data[entity];
 		}
 
-		auto tryGet(const Entity& entity) const -> std::optional<std::reference_wrapper<T>> {
+		auto tryGet(const Entity &entity) const -> std::optional<std::reference_wrapper<T>> {
 			if (!has(entity)) {
 				return std::nullopt;
 			}
@@ -75,7 +75,7 @@ namespace macroengine {
 			return std::ref(*data[entity]);
 		}
 
-		bool has(const Entity& entity) const {
+		bool has(const Entity &entity) const {
 			if (data.size() <= entity) {
 				return false;
 			}
@@ -83,13 +83,13 @@ namespace macroengine {
 			return data[entity] != nullptr;
 		}
 
-		void destroy(const Entity& entity) override {
+		void destroy(const Entity &entity) override {
 			if (has(entity)) {
 				data[entity] = nullptr;
 			}
 		}
 
-		void updateCapacity(const Entity& entity) {
+		void updateCapacity(const Entity &entity) {
 			if (data.size() <= entity) {
 				data.resize(entity + 1);
 			}
