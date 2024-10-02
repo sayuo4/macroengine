@@ -4,7 +4,7 @@
 #include "ecs/entity.hpp"
 #include "ecs/i_storage.hpp"
 #include "ecs/storage.hpp"
-#include "ecs/basic_exclude.hpp"
+#include "ecs/exclude.hpp"
 
 #include <vector>
 #include <typeindex>
@@ -43,7 +43,7 @@ namespace macroengine {
 		}
 
 		template <typename... T, typename... U>
-		auto getFromVec(std::vector<Entity> &vec, BasicExclude<U...>) -> std::vector<std::tuple<T&...>> {
+		auto getFromVec(std::vector<Entity> &vec, Exclude<U...>) -> std::vector<std::tuple<T&...>> {
 			std::vector<std::tuple<T&...>> result;
 			result.reserve(vec.size());
 
@@ -175,12 +175,12 @@ namespace macroengine {
 		}
 
 		template <typename... T, typename... U>
-		auto get(BasicExclude<U...> exclude = BasicExclude{}) -> std::vector<std::tuple<T&...>> {
+		auto get(Exclude<U...> exclude = Exclude{}) -> std::vector<std::tuple<T&...>> {
 			return getFromVec<T...>(activeEntities, exclude);
 		}
 
 		template <typename... T, typename... U>
-		auto getAll(BasicExclude<U...> exclude = BasicExclude{}) -> std::vector<std::tuple<T&...>> {
+		auto getAll(Exclude<U...> exclude = Exclude{}) -> std::vector<std::tuple<T&...>> {
 			return getFromVec<T...>(aliveEntities, exclude);
 		}
 

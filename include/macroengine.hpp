@@ -5,6 +5,6 @@
 #include "ecs/i_storage.hpp"
 #include "ecs/storage.hpp"
 #include "ecs/world.hpp"
-#include "ecs/basic_exclude.hpp"
+#include "ecs/exclude.hpp"
 
 #endif
