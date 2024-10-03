@@ -13,12 +13,12 @@
 #include <memory>
 #include <iostream>
 
-#define MACROENGINE_ADD_SYSTEM(vector, ...)				  		  \
-	vector.emplace_back([this, system]() {					  	  \
-		system(__VA_ARGS__); 									  \
-	});															  \
-																  \
-	return *this;												  \
+#define ADD_SYSTEM(vector, ...)			   \
+	vector.emplace_back([this, system]() { \
+		system(__VA_ARGS__); 			   \
+	});									   \
+										   \
+	return *this;						   \
 
 namespace macroengine {
 	class App final {
@@ -54,7 +54,7 @@ namespace macroengine {
 		
 		template <typename... T>
 		App &addStartupSystem(std::function<void(Query<T...>)> system) {
-			MACROENGINE_ADD_SYSTEM(
+			ADD_SYSTEM(
 				startupSystems,
 				getQuery<T...>()
 			)
@@ -62,7 +62,7 @@ namespace macroengine {
 
 		template <typename... T, typename... U>
 		App &addStartupSystem(std::function<void(Query<T...>, Without<U...>)> system) {
-			MACROENGINE_ADD_SYSTEM(
+			ADD_SYSTEM(
 				startupSystems,
 				getQuery<T...>(Exclude<U...>{}), Without<U...>{}
 			)
@@ -72,7 +72,7 @@ namespace macroengine {
 		
 		template <typename... T>
 		App &addStartupSystem(std::function<void(Registry&, Query<T...>)> system) {
-			MACROENGINE_ADD_SYSTEM(
+			ADD_SYSTEM(
 				startupSystems,
 				registry, getQuery<T...>()
 			)
@@ -80,7 +80,7 @@ namespace macroengine {
 
 		template <typename... T, typename... U>
 		App &addStartupSystem(std::function<void(Registry&, Query<T...>, Without<U...>)> system) {
-			MACROENGINE_ADD_SYSTEM(
+			ADD_SYSTEM(
 				startupSystems,
 				registry, getQuery<T...>(Exclude<U...>{}), Without<U...>{}
 			)
@@ -91,7 +91,7 @@ namespace macroengine {
 
 		template <typename... T>
 		App &addSystem(std::function<void(Query<T...>)> system, Update updateType = Update::Frame) {
-			MACROENGINE_ADD_SYSTEM(
+			ADD_SYSTEM(
 				updateType == Update::Frame ? frameUpdateSystems : fixedUpdateSystems,
 				getQuery<T...>()
 			);
@@ -99,7 +99,7 @@ namespace macroengine {
 
 		template <typename... T, typename... U>
 		App &addSystem(std::function<void(Query<T...>, Without<U...>)> system, Update updateType = Update::Frame) {
-			MACROENGINE_ADD_SYSTEM(
+			ADD_SYSTEM(
 				updateType == Update::Frame ? frameUpdateSystems : fixedUpdateSystems,
 				getQuery<T...>(Exclude<U...>{}), Without<U...>{}
 			)
@@ -109,7 +109,7 @@ namespace macroengine {
 
 		template <typename... T>
 		App &addSystem(std::function<void(Registry&, Query<T...>)> system, Update updateType = Update::Frame) {
-			MACROENGINE_ADD_SYSTEM(
+			ADD_SYSTEM(
 				updateType == Update::Frame ? frameUpdateSystems : fixedUpdateSystems,
 				registry, getQuery<T...>()
 			)
@@ -117,7 +117,7 @@ namespace macroengine {
 
 		template <typename... T, typename... U>
 		App &addSystem(std::function<void(Registry&, Query<T...>, Without<U...>)> system, Update updateType = Update::Frame) {
-			MACROENGINE_ADD_SYSTEM(
+			ADD_SYSTEM(
 				updateType == Update::Frame ? frameUpdateSystems : fixedUpdateSystems,
 				registry, getQuery<T...>(Exclude<U...>{}), Without<U...>{}
 			)
@@ -133,5 +133,5 @@ namespace macroengine {
 	};
 }
 
-#undef MACROENGINE_ADD_SYSTEM
+#undef ADD_SYSTEM
 #endif
