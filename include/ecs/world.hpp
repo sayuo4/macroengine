@@ -142,7 +142,7 @@ namespace macroengine {
 			return getStorage<T>().get(entity);
 		}
 
-		template <typename... T>
+		template <typename... T, typename = std::enable_if_t<(sizeof...(T) > 1)>>
 		std::tuple<T&...> get(const Entity &entity) {
 			validateEntity(entity, "Trying to get a components from an invalid entity.");
 			validateEntityAliveState(entity, "Trying to get a components from a destroyed entity.");
@@ -162,7 +162,7 @@ namespace macroengine {
 			return getStorage<T>().tryGet(entity);
 		}
 
-		template <typename... T>
+		template <typename... T, typename = std::enable_if_t<(sizeof...(T) > 1)>>
 		auto tryGet(const Entity &entity) -> std::optional<std::tuple<T&...>> {
 			validateEntity(entity, "Trying to get a components from an invalid entity.");
 			validateEntityAliveState(entity, "Trying to get a components from a destroyed entity.");
@@ -192,7 +192,7 @@ namespace macroengine {
 			return getStorage<T>().has(entity);
 		}
 
-		template <typename... T>
+		template <typename... T, typename = std::enable_if_t<(sizeof...(T) > 1)>>
 		bool has(const Entity &entity) {
 			validateEntity(entity, "Trying to check a components from in invalid entity.");
 			validateEntityAliveState(entity, "Trying to check a components in a destroyed entity.");
