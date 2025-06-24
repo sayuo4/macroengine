@@ -1,0 +1,8 @@
+bin/
+src/main.cpp
+CMakeFiles/
+.clangd
+cmake_install.cmake
+CMakeLists.txt
+CMakeCache.txt
+Makefile

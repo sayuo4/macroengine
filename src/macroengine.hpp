@@ -1,0 +1,4 @@
+#ifndef MACROENGINE_HPP
+#define MACROENGINE_HPP
+
+#endif
