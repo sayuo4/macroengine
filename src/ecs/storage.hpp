@@ -25,11 +25,12 @@
 #include <memory>
 #include <utility>
 
+#include "ecs/i_storage.hpp"
 #include "ecs/entity_id.hpp"
 
 namespace macroengine {
 	template <typename T, std::size_t PAGE_SIZE = 1024>
-	struct Storage final {
+	struct Storage final : public IStorage {
 	public:
 		static_assert(PAGE_SIZE > 0, "PAGE_SIZE must be greater than zero");
 		
