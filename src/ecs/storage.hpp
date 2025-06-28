@@ -35,8 +35,8 @@ namespace macroengine {
 		
 		// Inserts a value associated with a given entity ID.
 		// Throws std::logic_error if the entity is already stored.
-		void insert(const EntityID entity, const T& value) {
-			auto pageIndex = getPageIndex(entity);
+		void insert(EntityID entity, const T& value) {
+			const auto pageIndex = getPageIndex(entity);
 			sparsePages.resize(pageIndex + 1);
 
 			auto& pagePtr = sparsePages[pageIndex];
@@ -57,16 +57,16 @@ namespace macroengine {
 		// Removes the value associated with a given entity ID.
 		// Throws if the entity is not stored.
 		void remove(EntityID entity) {
-			auto denseIndex = getDenseIndexOrThrow(entity);
-			auto lastIndex = dense.size() - 1;
+			const auto denseIndex = getDenseIndexOrThrow(entity);
+			const auto lastIndex = dense.size() - 1;
 
 			// Moves last element to the removed position to keep dense vector compact
 			if (denseIndex != lastIndex) {
 				dense[denseIndex] = std::move(dense[lastIndex]);
 
-				auto movedEntity = dense[denseIndex].second;
-				auto movedPageIndex = getPageIndex(movedEntity);
-				auto movedOffset = getEntityOffset(movedEntity);
+				const auto movedEntity = dense[denseIndex].second;
+				const auto movedPageIndex = getPageIndex(movedEntity);
+				const auto movedOffset = getEntityOffset(movedEntity);
 				(*sparsePages[movedPageIndex])[movedOffset] = denseIndex;
 			}
 
@@ -128,11 +128,11 @@ namespace macroengine {
 		std::vector<std::unique_ptr<SparsePage>> sparsePages;
 		std::vector<std::pair<T, EntityID>> dense;
 
-		inline std::size_t getPageIndex(const EntityID entity) const {
+		inline std::size_t getPageIndex(EntityID entity) const {
 			return entity / PAGE_SIZE;
 		}
 
-		inline std::size_t getEntityOffset(const EntityID entity) const {
+		inline std::size_t getEntityOffset(EntityID entity) const {
 			return entity % PAGE_SIZE;
 		}
 
@@ -144,7 +144,7 @@ namespace macroengine {
 			!sparsePages[pageIndex])
 				throw std::out_of_range("SparseSet: entity out of bounds");
 
-			auto denseIndex = (*sparsePages[pageIndex])[offset];
+			const auto denseIndex = (*sparsePages[pageIndex])[offset];
 
 			if (denseIndex == INVALID_DENSE_INDEX)
 				throw std::out_of_range("SparseSet: no value at given entity");
