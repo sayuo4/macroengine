@@ -49,7 +49,7 @@ namespace macroengine {
 			}
 
 			if ((*pagePtr)[getEntityOffset(entity)] != INVALID_DENSE_INDEX)
-				throw std::logic_error("SparseSet: entity already inserted");
+				throw std::logic_error("Storage: entity already inserted");
 
 			dense.emplace_back(value, entity);
 			(*pagePtr)[getEntityOffset(entity)] = dense.size() - 1;
@@ -138,17 +138,19 @@ namespace macroengine {
 		}
 
 		std::size_t getDenseIndexOrThrow(EntityID entity) const {
+			constexpr const char* ERROR_MSG = "Storage: no value associated with given entity";
+
 			const auto pageIndex = getPageIndex(entity);
 			const auto offset = getEntityOffset(entity);
 
 			if (pageIndex >= sparsePages.size() ||
 			!sparsePages[pageIndex])
-				throw std::out_of_range("SparseSet: entity out of bounds");
+				throw std::out_of_range(ERROR_MSG);
 
 			const auto denseIndex = (*sparsePages[pageIndex])[offset];
 
 			if (denseIndex == INVALID_DENSE_INDEX)
-				throw std::out_of_range("SparseSet: no value at given entity");
+				throw std::out_of_range(ERROR_MSG);
 
 			return denseIndex;
 		}
