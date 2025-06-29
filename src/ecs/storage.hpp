@@ -48,11 +48,13 @@ namespace macroengine {
 			    pagePtr->fill(INVALID_DENSE_INDEX);
 			}
 
-			if ((*pagePtr)[getEntityOffset(entity)] != INVALID_DENSE_INDEX)
+			const auto offset = getEntityOffset(entity);
+
+			if ((*pagePtr)[offset] != INVALID_DENSE_INDEX)
 				throw std::logic_error("Storage: entity already inserted");
 
 			dense.emplace_back(value, entity);
-			(*pagePtr)[getEntityOffset(entity)] = dense.size() - 1;
+			(*pagePtr)[offset] = dense.size() - 1;
 		}
 
 		// Removes the value associated with a given entity ID.
@@ -68,6 +70,7 @@ namespace macroengine {
 				const auto movedEntity = dense[denseIndex].second;
 				const auto movedPageIndex = getPageIndex(movedEntity);
 				const auto movedOffset = getEntityOffset(movedEntity);
+				
 				(*sparsePages[movedPageIndex])[movedOffset] = denseIndex;
 			}
 
@@ -75,6 +78,7 @@ namespace macroengine {
 
 			const auto pageIndex = getPageIndex(entity);
 			const auto offset = getEntityOffset(entity);
+
 			(*sparsePages[pageIndex])[offset] = INVALID_DENSE_INDEX;
 		}
 
@@ -141,12 +145,11 @@ namespace macroengine {
 			constexpr const char* ERROR_MSG = "Storage: no value associated with given entity";
 
 			const auto pageIndex = getPageIndex(entity);
-			const auto offset = getEntityOffset(entity);
 
-			if (pageIndex >= sparsePages.size() ||
-			!sparsePages[pageIndex])
+			if (pageIndex >= sparsePages.size() || !sparsePages[pageIndex])
 				throw std::out_of_range(ERROR_MSG);
 
+			const auto offset = getEntityOffset(entity);
 			const auto denseIndex = (*sparsePages[pageIndex])[offset];
 
 			if (denseIndex == INVALID_DENSE_INDEX)
